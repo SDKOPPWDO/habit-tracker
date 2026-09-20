@@ -95,8 +95,18 @@
 
   table.grid{border-collapse:separate;border-spacing:0;width:100%;min-width:820px;table-layout:fixed}
   table.grid th,table.grid td{padding:0;text-align:center}
-  col.firstcol{width:170px}
+  col.firstcol{width:200px}
   col.daycol{width:36px}
+  /* 凍結左側第一欄（My Habits / Mental State），往右捲動時保持可見 */
+  table.grid .cornerhead,
+  table.grid td.hname,
+  table.grid tfoot th,
+  table.grid tr.mlabel th,
+  table.grid tr.scorerow th{position:sticky;left:0;z-index:2;box-shadow:1px 0 0 var(--line)}
+  table.grid .cornerhead{z-index:3;background:var(--panel)}
+  table.grid tfoot th,
+  table.grid tr.mlabel th,
+  table.grid tr.scorerow th{background:var(--panel)}
   .cornerhead{text-align:left;padding:6px 12px !important;vertical-align:bottom}
   .cornerhead .t{font-size:20px;font-weight:600}
   .whead{color:#fff;font-weight:700;padding:8px 4px !important;font-size:13px;letter-spacing:.03em}
@@ -110,8 +120,12 @@
   .dh4{background:color-mix(in srgb,var(--w4) 30%,var(--panel))}
   .dh5{background:color-mix(in srgb,var(--w5) 30%,var(--panel))}
 
-  .hname{text-align:left;background:var(--panel)}
-  .hname input{width:100%;background:transparent;border:0;border-bottom:1px solid transparent;color:var(--ink);font-size:14px;padding:8px 12px;text-align:left;font-family:inherit}
+  .hname{text-align:left;background:var(--panel);vertical-align:middle}
+  .hname input{width:100%;background:transparent;border:0;border-bottom:1px solid transparent;color:var(--ink);font-size:14px;padding:6px 12px 2px;text-align:left;font-family:inherit}
+  .hprog{display:flex;align-items:center;gap:8px;padding:0 12px 4px}
+  .hbar{flex:1 1 auto;min-width:0;height:8px;background:var(--panel-3);border-radius:4px;overflow:hidden}
+  .hbar>i{display:block;height:100%;border-radius:4px;width:0}
+  .hpct{flex:0 0 auto;font-size:11px;font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap;text-align:right}
   .hname input::placeholder{color:var(--faint)}
   .hname input:focus{outline:0;border-bottom:1px solid var(--w1)}
   tr.habit td.day{background:var(--panel)}
@@ -138,8 +152,8 @@
 
   /* analysis side (habits) */
   .side h2{font-size:20px;text-align:center;margin-bottom:14px;color:var(--ink)}
-  .analrow{display:grid;grid-template-columns:minmax(0,1fr) 68px 66px;gap:12px;align-items:center;padding:7px 0}
-  .analrow .nm{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .analrow{display:grid;grid-template-columns:58px 52px minmax(0,1fr);gap:10px;align-items:center;padding:7px 0}
+  .analrow .nm{font-size:13px;line-height:1.25;overflow-wrap:anywhere}
   .minibar{height:10px;background:var(--panel-3);border-radius:5px;overflow:hidden}
   .minibar>i{display:block;height:100%;border-radius:5px}
   .analrow .p{text-align:right;font-variant-numeric:tabular-nums;font-size:13px;font-weight:600;white-space:nowrap}
@@ -260,16 +274,12 @@
       <div class="kpi"><span class="lab">Progress in %</span><span class="val tabular" id="kPct">0%</span></div>
     </div>
 
-    <div class="board">
+    <div>
       <div class="panel">
         <div class="scrollx"><table class="grid" id="habitTable"></table></div>
         <div class="chartbox" style="margin-top:14px">
           <svg id="progressSvg" viewBox="0 0 1000 200" width="100%" height="200" aria-hidden="true"></svg>
         </div>
-      </div>
-      <div class="panel side">
-        <h2>Analysis</h2>
-        <div id="analysis"></div>
       </div>
     </div>
 
@@ -409,7 +419,8 @@
     html+="</tr></thead><tbody>";
 
     for(var r=0;r<ROWS;r++){
-      html+='<tr class="habit"><td class="hname"><input type="text" id="h_'+r+'" placeholder="習慣 '+(r+1)+'" value="'+escAttr(d.habits[r]||"")+'"></td>';
+      var col=ANAL_COLORS[r%ANAL_COLORS.length];
+      html+='<tr class="habit"><td class="hname"><input type="text" id="h_'+r+'" placeholder="習慣 '+(r+1)+'" value="'+escAttr(d.habits[r]||"")+'"><div class="hprog"><span class="hbar"><i id="hb_'+r+'" style="background:'+col+'"></i></span><span class="hpct" id="hp_'+r+'" style="color:'+col+'">0.00%</span></div></td>';
       weeks.forEach(function(w){ w.days.forEach(function(dd){
         var on=!!d.checks[r+"_"+dd.d];
         html+='<td class="day c'+(w.idx+1)+'"><span class="chk" role="checkbox" tabindex="0" aria-checked="'+on+'" data-r="'+r+'" data-d="'+dd.d+'"></span></td>';
@@ -495,16 +506,11 @@
   }
 
   function renderAnalysis(C){
-    var d=monthData(state.year,state.month),box=document.getElementById("analysis"); box.innerHTML="";
     for(var r=0;r<ROWS;r++){
-      var nm=(d.habits[r]&&d.habits[r].trim())?d.habits[r]:"—";
-      var col=ANAL_COLORS[r%ANAL_COLORS.length];
-      var p=C.perHabit[r]/C.n;
-      var el=document.createElement("div"); el.className="analrow";
-      el.innerHTML='<span class="nm">'+escHtml(nm)+'</span>'+
-        '<span class="minibar"><i style="width:'+Math.min(100,p*100)+'%;background:'+col+'"></i></span>'+
-        '<span class="p" style="color:'+col+'">'+pct(p)+'</span>';
-      box.appendChild(el);
+      var p=C.perHabit[r]/C.n, col=heatColor(p);
+      var bar=document.getElementById("hb_"+r), pctEl=document.getElementById("hp_"+r);
+      if(bar){ bar.style.width=Math.min(100,p*100)+"%"; bar.style.background=col; }
+      if(pctEl){ pctEl.textContent=pct(p); pctEl.style.color=col; }
     }
   }
 
