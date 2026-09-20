@@ -1,0 +1,757 @@
+<title>Habit Tracker</title>
+<style>
+  :root{
+    --bg:#080e1c;
+    --panel:#111c30;
+    --panel-2:#16233a;
+    --panel-3:#1b2b45;
+    --line:#243654;
+    --ink:#eef3fb;
+    --muted:#8ea3c4;
+    --faint:#5b6f92;
+    --w1:#7b6cf0;
+    --w2:#5090dd;
+    --w3:#2bc7b8;
+    --w4:#e881a6;
+    --w5:#57d39a;
+    --danger:#e74c3c;
+    --good:#4fd39a;
+    --pink:#e881a6;
+    --shadow:0 10px 30px rgba(0,0,0,.35);
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,"Noto Sans TC","Microsoft JhengHei",sans-serif;
+    font-size:14px;line-height:1.4;
+  }
+  .wrap{max-width:1600px;margin:0 auto;padding-block:20px;padding-left:20px;padding-right:20px}
+  h1,h2,h3{margin:0;font-weight:600}
+  .tabular{font-variant-numeric:tabular-nums}
+
+  .topbar{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;margin-bottom:18px}
+  .brand{display:flex;flex-direction:column;gap:2px}
+  .brand .kick{color:var(--muted);letter-spacing:.14em;text-transform:uppercase;font-size:11px}
+  .brand h1{font-size:24px;letter-spacing:.02em}
+  .topright{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .ghbtn{appearance:none;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer;padding:11px 16px;border-radius:12px;font-weight:600;font-size:13px;font-family:inherit}
+  .ghbtn:hover{border-color:var(--w1)}
+  .ghbtn[aria-expanded="true"]{border-color:var(--w1);color:#fff;background:linear-gradient(135deg,var(--w1),var(--w2))}
+  .ghgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+  .ghfield{display:flex;flex-direction:column;gap:5px}
+  .ghfield label{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .ghfield input{background:var(--panel-3);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:9px 11px;font-size:14px;font-family:inherit}
+  .ghfield input:focus{outline:2px solid var(--w1);outline-offset:1px}
+  .ghactions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:14px}
+  .ghact{appearance:none;border:0;cursor:pointer;border-radius:9px;padding:10px 18px;font-weight:600;font-size:13px;color:#fff;font-family:inherit}
+  .ghact.save{background:linear-gradient(135deg,var(--w1),var(--w2))}
+  .ghact.load{background:var(--panel-3);border:1px solid var(--line);color:var(--ink)}
+  .ghact.clear{background:transparent;border:1px solid var(--line);color:var(--muted)}
+  .ghact:disabled{opacity:.55;cursor:default}
+  .ghremember{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:13px;cursor:pointer}
+  .ghstatus{margin-top:12px;font-size:13px;min-height:18px;color:var(--muted)}
+  .ghstatus.ok{color:var(--good)}
+  .ghstatus.err{color:#ff8a7a}
+  .ghnote{color:var(--faint);font-size:12px;margin-top:10px;line-height:1.55}
+  .yearbox{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+  .yearbox label{color:var(--muted);font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+  .yearbox input{
+    width:92px;background:var(--panel-3);border:1px solid var(--line);color:var(--ink);
+    border-radius:8px;padding:7px 10px;font-size:16px;font-weight:600;text-align:center;
+    font-variant-numeric:tabular-nums;
+  }
+  .yearbox input:focus{outline:2px solid var(--w1);outline-offset:1px}
+
+  .tabs{display:flex;gap:6px;margin-bottom:18px;background:var(--panel);padding:6px;border-radius:14px;border:1px solid var(--line);width:max-content;max-width:100%}
+  .tab{appearance:none;border:0;cursor:pointer;color:var(--muted);background:transparent;padding:10px 22px;border-radius:10px;font-size:14px;font-weight:600;letter-spacing:.02em;white-space:nowrap}
+  .tab[aria-selected="true"]{background:linear-gradient(135deg,var(--w1),var(--w2));color:#fff;box-shadow:var(--shadow)}
+  .tab:focus-visible{outline:2px solid var(--w3);outline-offset:2px}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px}
+
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:0;background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-bottom:16px}
+  .kpi{padding:16px 20px;display:flex;flex-direction:column;gap:8px;align-items:center;text-align:center;border-right:1px solid var(--line)}
+  .kpi:last-child{border-right:0}
+  .kpi .lab{color:var(--muted);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+  .kpi .val{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums}
+  .bar{width:100%;max-width:230px;height:16px;background:var(--panel-3);border:1px solid var(--line);border-radius:5px;overflow:hidden}
+  .bar > i{display:block;height:100%;background:linear-gradient(90deg,#e74c3c,#f0714b);transition:width .3s}
+
+  /* month selector */
+  .selectorbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:16px}
+  .msel{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 12px}
+  .msel label{color:var(--muted);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+  .msel select{background:var(--panel-3);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:7px 12px;font-size:15px;font-weight:600;font-family:inherit;min-width:130px}
+  .msel select:focus{outline:2px solid var(--w1);outline-offset:1px}
+  .monthrow{display:flex;flex-wrap:wrap;gap:6px}
+  .mbtn{appearance:none;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);cursor:pointer;padding:8px 13px;border-radius:9px;font-weight:600;font-size:13px}
+  .mbtn[aria-current="true"]{background:linear-gradient(135deg,var(--w1),var(--w2));color:#fff;border-color:transparent}
+  .mbtn:focus-visible{outline:2px solid var(--w3);outline-offset:2px}
+
+  .board{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:16px;align-items:start}
+  @media(max-width:1100px){.board{grid-template-columns:1fr}}
+  .scrollx{overflow-x:auto;border-radius:12px}
+
+  table.grid{border-collapse:separate;border-spacing:0;width:100%;min-width:820px;table-layout:fixed}
+  table.grid th,table.grid td{padding:0;text-align:center}
+  col.firstcol{width:170px}
+  col.daycol{width:36px}
+  .cornerhead{text-align:left;padding:6px 12px !important;vertical-align:bottom}
+  .cornerhead .t{font-size:20px;font-weight:600}
+  .whead{color:#fff;font-weight:700;padding:8px 4px !important;font-size:13px;letter-spacing:.03em}
+  .w1{background:var(--w1)}.w2{background:var(--w2)}.w3{background:var(--w3)}.w4{background:var(--w4)}.w5{background:var(--w5)}
+  .dayhd{font-size:11px;line-height:1.25;padding:6px 0 8px !important;color:#fff;font-weight:600}
+  .dayhd .dow{opacity:.85;font-size:10px;display:block}
+  .dayhd .dnum{font-size:13px;font-variant-numeric:tabular-nums}
+  .dh1{background:color-mix(in srgb,var(--w1) 34%,var(--panel))}
+  .dh2{background:color-mix(in srgb,var(--w2) 34%,var(--panel))}
+  .dh3{background:color-mix(in srgb,var(--w3) 30%,var(--panel))}
+  .dh4{background:color-mix(in srgb,var(--w4) 30%,var(--panel))}
+  .dh5{background:color-mix(in srgb,var(--w5) 30%,var(--panel))}
+
+  .hname{text-align:left;background:var(--panel)}
+  .hname input{width:100%;background:transparent;border:0;border-bottom:1px solid transparent;color:var(--ink);font-size:14px;padding:8px 12px;text-align:left;font-family:inherit}
+  .hname input::placeholder{color:var(--faint)}
+  .hname input:focus{outline:0;border-bottom:1px solid var(--w1)}
+  tr.habit td.day{background:var(--panel)}
+  tr.habit:nth-child(even) td.day,tr.habit:nth-child(even) .hname{background:var(--panel-2)}
+  td.day{padding:4px 0}
+  .chk{width:20px;height:20px;margin:0 auto;border:1.8px solid var(--w1);border-radius:5px;cursor:pointer;display:block;background:transparent;position:relative;transition:background .12s}
+  td.day.c2 .chk{border-color:var(--w2)}td.day.c3 .chk{border-color:var(--w3)}
+  td.day.c4 .chk{border-color:var(--w4)}td.day.c5 .chk{border-color:var(--w5)}
+  td.day.c1 .chk{color:var(--w1)}td.day.c2 .chk{color:var(--w2)}td.day.c3 .chk{color:var(--w3)}
+  td.day.c4 .chk{color:var(--w4)}td.day.c5 .chk{color:var(--w5)}
+  .chk[aria-checked="true"]{background:currentColor}
+  .chk[aria-checked="true"]::after{content:"";position:absolute;left:6px;top:2px;width:5px;height:10px;border:solid #0b1120;border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
+  .chk:focus-visible{outline:2px solid #fff;outline-offset:2px}
+
+  /* footer: Progress / Done / Not Done — aligned to day columns */
+  tfoot{border-top:2px solid var(--line)}
+  tfoot th{text-align:left;padding:8px 12px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink);white-space:nowrap}
+  tfoot td{padding:8px 0;font-size:12px;font-variant-numeric:tabular-nums;text-align:center}
+  tfoot tr.r-prog td{color:var(--good);font-weight:700}
+  tfoot tr.r-prog{background:rgba(79,211,154,.06)}
+  tfoot tr.r-done td{color:var(--ink)}
+  tfoot tr.r-not td{color:var(--ink)}
+  tfoot tr.r-prog th{color:var(--good)}
+
+  /* analysis side (habits) */
+  .side h2{font-size:20px;text-align:center;margin-bottom:14px;color:var(--ink)}
+  .analrow{display:grid;grid-template-columns:minmax(0,1fr) 68px 66px;gap:12px;align-items:center;padding:7px 0}
+  .analrow .nm{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .minibar{height:10px;background:var(--panel-3);border-radius:5px;overflow:hidden}
+  .minibar>i{display:block;height:100%;border-radius:5px}
+  .analrow .p{text-align:right;font-variant-numeric:tabular-nums;font-size:13px;font-weight:600;white-space:nowrap}
+
+  /* mental */
+  .mental h2{font-size:20px}
+  select.rate{background:var(--panel-3);border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:4px 4px;font-size:12px;width:100%;min-width:0;text-align:center;font-variant-numeric:tabular-nums;font-family:inherit}
+  select.rate:focus{outline:2px solid var(--w1);outline-offset:1px}
+  table.grid td.mday{padding:5px 3px}
+  tr.mlabel th{text-align:left;padding-left:12px;color:var(--ink);font-weight:600}
+  tr.scorerow td{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;padding:7px 0;text-align:center}
+  tr.scorerow th{text-align:left;padding-left:12px;color:var(--ink);font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:12px}
+  tr.scorerow{background:rgba(123,108,240,.06)}
+  tr.scorerow td{color:var(--w1);font-weight:700}
+
+  .legend{display:flex;gap:20px;font-size:13px;color:var(--muted)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+  .chartbox{margin-top:14px;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:14px 12px 8px}
+
+  .mind-h{display:flex;justify-content:space-between;font-size:13px;font-weight:700;color:var(--w2);margin-bottom:8px}
+  .mindrow{display:grid;grid-template-columns:56px 1fr 62px;gap:12px;align-items:center;padding:6px 0}
+  .mindrow .lab{color:var(--muted);font-size:13px}
+  .mindrow .mb{height:10px;background:var(--panel-3);border-radius:5px;overflow:hidden}
+  .mindrow .mb>i{display:block;height:100%;border-radius:5px}
+  .mindrow .pv{text-align:right;font-variant-numeric:tabular-nums;font-size:13px;font-weight:600;white-space:nowrap}
+
+  /* dashboard */
+  .dash-head{text-align:center;margin-bottom:8px}
+  .dash-head h2{font-size:26px}
+  .dash-head p{color:var(--muted);margin:4px 0 0}
+  .yearchart{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px 10px 6px;margin-bottom:16px}
+  .yearchart .legend{justify-content:center;margin-bottom:6px}
+  .months{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media(max-width:1000px){.months{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:560px){.months{grid-template-columns:1fr}}
+  .mcard{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;cursor:pointer;transition:transform .12s,border-color .12s}
+  .mcard:hover{transform:translateY(-2px);border-color:var(--w1)}
+  .mcard h3{text-align:center;font-size:18px;padding:12px 0 8px}
+  .mcard .mrow{display:flex;justify-content:space-between;padding:5px 14px;font-size:13px;color:var(--muted)}
+  .mcard .mrow b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+  .mcard .prog{display:flex;justify-content:space-between;padding:6px 14px;color:#0b1120;font-weight:600;font-size:13px;background:var(--good)}
+  .mcard .mind{display:flex;justify-content:space-between;padding:6px 14px;color:#0b1120;font-weight:600;font-size:13px;background:var(--pink)}
+  .muted{color:var(--muted)}
+  .hint{color:var(--faint);font-size:12px;margin-top:14px;text-align:center}
+</style>
+
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand">
+      <span class="kick">Habit Tracker</span>
+      <h1>習慣追蹤器</h1>
+    </div>
+    <div class="topright">
+      <button class="ghbtn" id="ghToggle">☁ GitHub 同步</button>
+      <div class="yearbox">
+        <label for="yearInput">西元年</label>
+        <input id="yearInput" type="number" min="1970" max="2999" step="1" value="2026" inputmode="numeric">
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="ghPanel" hidden style="margin-bottom:18px">
+    <h2 style="font-size:18px;margin-bottom:4px">GitHub 同步</h2>
+    <p class="ghnote" style="margin-top:0">把習慣資料以 JSON 儲存到你自己的 GitHub repo。需要一組對該 repo 有「Contents 讀寫」權限的 Personal Access Token。</p>
+    <div class="ghgrid">
+      <div class="ghfield"><label for="ghOwner">GitHub 帳號 / ID</label><input id="ghOwner" placeholder="your-username" autocomplete="off" spellcheck="false"></div>
+      <div class="ghfield"><label for="ghRepo">Repository</label><input id="ghRepo" placeholder="habit-tracker" autocomplete="off" spellcheck="false"></div>
+      <div class="ghfield"><label for="ghBranch">Branch</label><input id="ghBranch" placeholder="main" autocomplete="off" spellcheck="false"></div>
+      <div class="ghfield"><label for="ghPath">檔案路徑 Path</label><input id="ghPath" placeholder="habit-data.json" autocomplete="off" spellcheck="false"></div>
+      <div class="ghfield" style="grid-column:1/-1"><label for="ghToken">Access Token</label><input id="ghToken" type="password" placeholder="ghp_… / github_pat_…" autocomplete="off" spellcheck="false"></div>
+    </div>
+    <div class="ghactions">
+      <button class="ghact save" id="ghSaveBtn">⬆ 上傳到 GitHub</button>
+      <button class="ghact load" id="ghLoadBtn">⬇ 從 GitHub 載入</button>
+      <label class="ghremember"><input type="checkbox" id="ghRemember"> 在此裝置記住 token</label>
+      <button class="ghact clear" id="ghClearBtn">清除 token</button>
+    </div>
+    <div class="ghstatus" id="ghStatus" aria-live="polite"></div>
+    <p class="ghnote">• Token 只存在你這台裝置的瀏覽器，不會傳給任何第三方。<br>• 在 Claude 預覽視窗中，瀏覽器沙盒會擋掉對外網路，同步會失敗——把此頁放到你的 GitHub Pages 或用本機瀏覽器開啟即可正常運作。<br>• 建議使用 fine-grained token，只授權這一個 repo 的 Contents 讀寫。</p>
+  </div>
+
+  <div class="tabs" role="tablist" aria-label="頁籤">
+    <button class="tab" id="tab-dash" role="tab" aria-selected="true" aria-controls="view-dash">主面板 Dashboard</button>
+    <button class="tab" id="tab-track" role="tab" aria-selected="false" aria-controls="view-track">習慣輸入面板</button>
+  </div>
+
+  <!-- ================= DASHBOARD ================= -->
+  <section id="view-dash" role="tabpanel" aria-labelledby="tab-dash">
+    <div class="dash-head">
+      <h2 id="dashTitle">Yearly Dashboard</h2>
+      <p class="muted">點任一月份卡片可跳到該月的習慣輸入面板</p>
+    </div>
+    <div class="yearchart">
+      <div class="legend">
+        <span><i class="dot" style="background:var(--good)"></i>Habit Progress</span>
+        <span><i class="dot" style="background:var(--pink)"></i>Mindset Score</span>
+      </div>
+      <svg id="yearSvg" viewBox="0 0 1000 260" width="100%" height="260" aria-hidden="true"></svg>
+    </div>
+    <div class="months" id="monthCards"></div>
+  </section>
+
+  <!-- ================= TRACKER ================= -->
+  <section id="view-track" role="tabpanel" aria-labelledby="tab-track" hidden>
+    <div class="selectorbar">
+      <div class="msel">
+        <label for="monthSelect">月份</label>
+        <select id="monthSelect"></select>
+      </div>
+      <div class="monthrow" id="monthRow"></div>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi"><span class="lab">Number of habits</span><span class="val tabular" id="kNum">0</span></div>
+      <div class="kpi"><span class="lab">Completed habits</span><span class="val tabular" id="kDone">0</span></div>
+      <div class="kpi"><span class="lab">Progress</span><span class="bar"><i id="kBar" style="width:0%"></i></span></div>
+      <div class="kpi"><span class="lab">Progress in %</span><span class="val tabular" id="kPct">0%</span></div>
+    </div>
+
+    <div class="board">
+      <div class="panel">
+        <div class="scrollx"><table class="grid" id="habitTable"></table></div>
+        <div class="chartbox" style="margin-top:14px">
+          <svg id="progressSvg" viewBox="0 0 1000 200" width="100%" height="200" aria-hidden="true"></svg>
+        </div>
+      </div>
+      <div class="panel side">
+        <h2>Analysis</h2>
+        <div id="analysis"></div>
+      </div>
+    </div>
+
+    <div class="board mental" style="margin-top:16px">
+      <div class="panel">
+        <div class="scrollx"><table class="grid" id="mentalTable"></table></div>
+        <div class="chartbox" style="margin-top:14px">
+          <div class="legend" style="margin-bottom:8px">
+            <span><i class="dot" style="background:var(--w1)"></i>Mood</span>
+            <span><i class="dot" style="background:var(--w3)"></i>Motivation</span>
+          </div>
+          <svg id="mentalSvg" viewBox="0 0 1000 240" width="100%" height="240" aria-hidden="true"></svg>
+        </div>
+      </div>
+      <div class="panel side">
+        <h2>Analysis</h2>
+        <div class="mind-h">Mood<span>Mindset Score</span></div>
+        <div id="moodAnal"></div>
+        <div class="mind-h" style="margin-top:18px">Motivation<span>Mindset Score</span></div>
+        <div id="motivAnal"></div>
+      </div>
+    </div>
+
+    <p class="hint">資料自動存在這台裝置的瀏覽器中。切換月份 / 年份會即時重新計算週次與星期。</p>
+  </section>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var ROWS = 10;
+  var MONTHS_EN = ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"];
+  var DOW = ["Su","Mo","Tu","We","Th","Fr","Sa"];
+  var WCLASS = ["w1","w2","w3","w4","w5"];
+  var ANAL_COLORS = ["#7b6cf0","#5090dd","#2bc7b8","#e881a6","#57d39a","#f6b93b","#e55039","#c56cf0","#26de81","#ff9f43"];
+  var LS_KEY = "habitTracker.v2";
+
+  var state = load();
+  if(!state.year) state.year = 2026;
+  if(state.month == null) state.month = new Date().getMonth();
+  if(!state.data) state.data = {};
+
+  function load(){ try{ var s=localStorage.getItem(LS_KEY); return s?JSON.parse(s):{}; }catch(e){ return {}; } }
+  function save(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){} }
+
+  function mkey(y,m){ return y+"-"+m; }
+  function monthData(y,m){
+    var k=mkey(y,m);
+    if(!state.data[k]) state.data[k]={habits:new Array(ROWS).fill(""),checks:{},mood:{},motiv:{}};
+    var d=state.data[k];
+    if(!d.habits) d.habits=new Array(ROWS).fill("");
+    if(!d.checks) d.checks={}; if(!d.mood) d.mood={}; if(!d.motiv) d.motiv={};
+    return d;
+  }
+  function daysIn(y,m){ return new Date(y,m+1,0).getDate(); }
+  function weeksOf(y,m){
+    var n=daysIn(y,m),weeks=[],day=1,wi=0;
+    while(day<=n){
+      var start=day,end=Math.min(day+6,n),days=[];
+      for(var dd=start;dd<=end;dd++) days.push({d:dd,dow:new Date(y,m,dd).getDay()});
+      weeks.push({idx:wi,start:start,end:end,days:days}); day=end+1; wi++;
+    }
+    return weeks;
+  }
+
+  function computeMonth(y,m){
+    var d=monthData(y,m),n=daysIn(y,m);
+    // 只計算「有輸入名稱」的習慣，分母 = 已輸入習慣數 × 天數
+    var named=0,isNamed=new Array(ROWS).fill(false);
+    for(var r0=0;r0<ROWS;r0++){ if(d.habits[r0]&&d.habits[r0].trim()){ isNamed[r0]=true; named++; } }
+    var totalChecks=0,perHabit=new Array(ROWS).fill(0),perDayDone={};
+    for(var r=0;r<ROWS;r++){ if(!isNamed[r]) continue; for(var day=1;day<=n;day++){
+      if(d.checks[r+"_"+day]){ totalChecks++; perHabit[r]++; perDayDone[day]=(perDayDone[day]||0)+1; }
+    } }
+    var denom=named*n;
+    var progress=denom?totalChecks/denom:0;
+    var moodSum=0,motivSum=0;
+    for(var day2=1;day2<=n;day2++){ moodSum+=(+d.mood[day2]||0); motivSum+=(+d.motiv[day2]||0); }
+    var mindset=(moodSum+motivSum)/(n*2*10);
+    return {n:n,named:named,totalChecks:totalChecks,perHabit:perHabit,perDayDone:perDayDone,progress:progress,mindset:mindset};
+  }
+  function pct(x){ return (x*100).toFixed(2)+"%"; }
+  function pct0(x){ return Math.round(x*100)+"%"; }
+
+  /* smooth curve path (Catmull-Rom -> cubic bezier) */
+  function smoothPath(pts){
+    if(!pts.length) return "";
+    if(pts.length<3){ var s="M "+pts[0].x+" "+pts[0].y; for(var i=1;i<pts.length;i++) s+=" L "+pts[i].x+" "+pts[i].y; return s; }
+    var p=pts, d="M "+p[0].x.toFixed(1)+" "+p[0].y.toFixed(1);
+    for(var i2=0;i2<p.length-1;i2++){
+      var p0=p[i2-1]||p[i2], p1=p[i2], p2=p[i2+1], p3=p[i2+2]||p[i2+1];
+      var c1x=p1.x+(p2.x-p0.x)/6, c1y=p1.y+(p2.y-p0.y)/6;
+      var c2x=p2.x-(p3.x-p1.x)/6, c2y=p2.y-(p3.y-p1.y)/6;
+      d+=" C "+c1x.toFixed(1)+" "+c1y.toFixed(1)+" "+c2x.toFixed(1)+" "+c2y.toFixed(1)+" "+p2.x.toFixed(1)+" "+p2.y.toFixed(1);
+    }
+    return d;
+  }
+
+  /* ---------- month selectors ---------- */
+  function renderMonthSelectors(){
+    var sel=document.getElementById("monthSelect");
+    if(!sel.options.length){
+      for(var m=0;m<12;m++){ var o=document.createElement("option"); o.value=m; o.textContent=MONTHS_EN[m]; sel.appendChild(o); }
+      sel.addEventListener("change", function(){ state.month=parseInt(sel.value,10); save(); renderTracker(); });
+    }
+    sel.value=state.month;
+
+    var row=document.getElementById("monthRow"); row.innerHTML="";
+    for(var mm=0;mm<12;mm++){(function(mm){
+      var b=document.createElement("button"); b.className="mbtn";
+      b.textContent=MONTHS_EN[mm].slice(0,3);
+      b.setAttribute("aria-current", mm===state.month?"true":"false");
+      b.onclick=function(){ state.month=mm; save(); renderTracker(); };
+      row.appendChild(b);
+    })(mm);}
+  }
+
+  /* ---------- tracker ---------- */
+  function colgroup(weeks,dayW){
+    var w=dayW||36;
+    var s='<colgroup><col class="firstcol">';
+    weeks.forEach(function(wk){ wk.days.forEach(function(){ s+='<col class="daycol" style="width:'+w+'px">'; }); });
+    return s+'</colgroup>';
+  }
+
+  function renderTracker(){
+    renderMonthSelectors();
+    var y=state.year,m=state.month;
+    var d=monthData(y,m),weeks=weeksOf(y,m);
+
+    var t=document.getElementById("habitTable");
+    var html=colgroup(weeks)+"<thead><tr>";
+    html+='<th class="cornerhead" rowspan="2"><span class="t">My Habits</span><br><span class="muted" style="font-size:12px">'+y+" · "+MONTHS_EN[m]+'</span></th>';
+    weeks.forEach(function(w){ html+='<th class="whead '+WCLASS[w.idx]+'" colspan="'+w.days.length+'">Week '+(w.idx+1)+'</th>'; });
+    html+="</tr><tr>";
+    weeks.forEach(function(w){ w.days.forEach(function(dd){ html+='<th class="dayhd dh'+(w.idx+1)+'"><span class="dow">'+DOW[dd.dow]+'</span><span class="dnum">'+dd.d+'</span></th>'; }); });
+    html+="</tr></thead><tbody>";
+
+    for(var r=0;r<ROWS;r++){
+      html+='<tr class="habit"><td class="hname"><input type="text" id="h_'+r+'" placeholder="習慣 '+(r+1)+'" value="'+escAttr(d.habits[r]||"")+'"></td>';
+      weeks.forEach(function(w){ w.days.forEach(function(dd){
+        var on=!!d.checks[r+"_"+dd.d];
+        html+='<td class="day c'+(w.idx+1)+'"><span class="chk" role="checkbox" tabindex="0" aria-checked="'+on+'" data-r="'+r+'" data-d="'+dd.d+'"></span></td>';
+      }); });
+      html+="</tr>";
+    }
+    html+="</tbody>";
+
+    var C=computeMonth(y,m),den=C.named;
+    html+="<tfoot>";
+    html+='<tr class="r-prog"><th>Progress</th>';
+    weeks.forEach(function(w){ w.days.forEach(function(dd){ var done=C.perDayDone[dd.d]||0; html+='<td>'+(den?pct0(done/den):"0%")+'</td>'; }); });
+    html+='</tr><tr class="r-done"><th>Done</th>';
+    weeks.forEach(function(w){ w.days.forEach(function(dd){ html+='<td>'+(C.perDayDone[dd.d]||0)+'</td>'; }); });
+    html+='</tr><tr class="r-not"><th>Not Done</th>';
+    weeks.forEach(function(w){ w.days.forEach(function(dd){ html+='<td>'+(den?den-(C.perDayDone[dd.d]||0):0)+'</td>'; }); });
+    html+="</tr></tfoot>";
+    t.innerHTML=html;
+
+    for(var rr=0;rr<ROWS;rr++){(function(rr){
+      var inp=document.getElementById("h_"+rr);
+      inp.addEventListener("input", function(){ d.habits[rr]=inp.value; save(); refreshStats(); });
+    })(rr);}
+    t.querySelectorAll(".chk").forEach(function(cb){
+      function toggle(){
+        var key=cb.getAttribute("data-r")+"_"+cb.getAttribute("data-d");
+        var on=!d.checks[key];
+        if(on) d.checks[key]=1; else delete d.checks[key];
+        cb.setAttribute("aria-checked",on); save(); refreshStats();
+      }
+      cb.addEventListener("click",toggle);
+      cb.addEventListener("keydown",function(e){ if(e.key===" "||e.key==="Enter"){ e.preventDefault(); toggle(); } });
+    });
+
+    renderMental();
+    refreshStats();
+  }
+
+  function refreshStats(){
+    var y=state.year,m=state.month,C=computeMonth(y,m);
+    document.getElementById("kNum").textContent=C.named;
+    document.getElementById("kDone").textContent=C.totalChecks;
+    document.getElementById("kBar").style.width=Math.min(100,C.progress*100)+"%";
+    document.getElementById("kPct").textContent=pct(C.progress);
+    var t=document.getElementById("habitTable"),foot=t.tFoot;
+    if(foot){
+      var weeks=weeksOf(y,m),days=[],den=C.named; weeks.forEach(function(w){w.days.forEach(function(dd){days.push(dd.d);});});
+      for(var i=0;i<days.length;i++){
+        var done=C.perDayDone[days[i]]||0;
+        foot.rows[0].cells[i+1].textContent=den?pct0(done/den):"0%";
+        foot.rows[1].cells[i+1].textContent=done;
+        foot.rows[2].cells[i+1].textContent=den?den-done:0;
+      }
+    }
+    renderAnalysis(C);
+    drawProgressChart(C);
+  }
+
+  function drawProgressChart(C){
+    var y=state.year,m=state.month,n=C.n;
+    var W=1000,H=200,padL=38,padR=14,padT=14,padB=24,iw=W-padL-padR,ih=H-padT-padB;
+    var svg=document.getElementById("progressSvg"); if(!svg) return;
+    function X(day){ return padL+(n>1?iw*((day-1)/(n-1)):iw/2); }
+    function Y(p){ return padT+ih*(1-p); }
+    var s='<defs><linearGradient id="pgrad" x1="0" y1="0" x2="0" y2="1">'+
+      '<stop offset="0%" stop-color="rgba(79,211,154,.45)"/>'+
+      '<stop offset="100%" stop-color="rgba(79,211,154,.02)"/></linearGradient></defs>';
+    for(var g=0;g<=4;g++){
+      var vv=g/4,yy=Y(vv);
+      s+='<line x1="'+padL+'" y1="'+yy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+yy.toFixed(1)+'" stroke="#243654" stroke-width="1"/>';
+      s+='<text x="'+(padL-6)+'" y="'+(yy+4).toFixed(1)+'" fill="#eef3fb" font-size="11" text-anchor="end">'+(vv*100)+'%</text>';
+    }
+    for(var day=1;day<=n;day++){ if(day===1||day%5===0||day===n)
+      s+='<text x="'+X(day).toFixed(1)+'" y="'+(H-6)+'" fill="#8ea3c4" font-size="10" text-anchor="middle">'+day+'</text>'; }
+    var pts=[];
+    var den=C.named||1;
+    for(var dd=1;dd<=n;dd++) pts.push({x:X(dd),y:Y((C.perDayDone[dd]||0)/den)});
+    var area=smoothPath(pts)+" L "+X(n).toFixed(1)+" "+Y(0).toFixed(1)+" L "+X(1).toFixed(1)+" "+Y(0).toFixed(1)+" Z";
+    s+='<path d="'+area+'" fill="url(#pgrad)"/>';
+    s+='<path d="'+smoothPath(pts)+'" fill="none" stroke="#5fd39a" stroke-width="2.4" stroke-linejoin="round"/>';
+    for(var i=0;i<n;i++){ if((C.perDayDone[i+1]||0)>0) s+='<circle cx="'+pts[i].x.toFixed(1)+'" cy="'+pts[i].y.toFixed(1)+'" r="2.4" fill="#5fd39a"/>'; }
+    svg.innerHTML=s;
+  }
+
+  function renderAnalysis(C){
+    var d=monthData(state.year,state.month),box=document.getElementById("analysis"); box.innerHTML="";
+    for(var r=0;r<ROWS;r++){
+      var nm=(d.habits[r]&&d.habits[r].trim())?d.habits[r]:"—";
+      var col=ANAL_COLORS[r%ANAL_COLORS.length];
+      var p=C.perHabit[r]/C.n;
+      var el=document.createElement("div"); el.className="analrow";
+      el.innerHTML='<span class="nm">'+escHtml(nm)+'</span>'+
+        '<span class="minibar"><i style="width:'+Math.min(100,p*100)+'%;background:'+col+'"></i></span>'+
+        '<span class="p" style="color:'+col+'">'+pct(p)+'</span>';
+      box.appendChild(el);
+    }
+  }
+
+  /* ---------- mental ---------- */
+  function renderMental(){
+    var y=state.year,m=state.month,d=monthData(y,m),weeks=weeksOf(y,m);
+    var t=document.getElementById("mentalTable");
+    var html=colgroup(weeks,52)+"<thead><tr>";
+    html+='<th class="cornerhead" rowspan="2"><span class="t">Mental State</span><br><span class="muted" style="font-size:12px">'+y+" · "+MONTHS_EN[m]+'</span></th>';
+    weeks.forEach(function(w){ html+='<th class="whead '+WCLASS[w.idx]+'" colspan="'+w.days.length+'">Week '+(w.idx+1)+'</th>'; });
+    html+="</tr><tr>";
+    weeks.forEach(function(w){ w.days.forEach(function(dd){ html+='<th class="dayhd dh'+(w.idx+1)+'"><span class="dow">'+DOW[dd.dow]+'</span><span class="dnum">'+dd.d+'</span></th>'; }); });
+    html+="</tr></thead><tbody>";
+    function selRow(kind,label){
+      var s='<tr class="mlabel"><th>'+label+'</th>';
+      weeks.forEach(function(w){ w.days.forEach(function(dd){
+        var v=(kind==="mood"?d.mood[dd.d]:d.motiv[dd.d])||0;
+        s+='<td class="mday"><select class="rate" data-kind="'+kind+'" data-d="'+dd.d+'">';
+        for(var i=0;i<=10;i++) s+='<option value="'+i+'"'+(i==v?" selected":"")+'>'+i+'</option>';
+        s+='</select></td>';
+      }); });
+      return s+"</tr>";
+    }
+    html+=selRow("mood","Mood")+selRow("motiv","Motivation");
+    html+='<tr class="scorerow"><th>Score</th>';
+    weeks.forEach(function(w){ w.days.forEach(function(dd){
+      var sc=((+d.mood[dd.d]||0)+(+d.motiv[dd.d]||0))/20;
+      html+='<td data-d="'+dd.d+'">'+pct0(sc)+'</td>';
+    }); });
+    html+="</tr></tbody>";
+    t.innerHTML=html;
+
+    t.querySelectorAll("select.rate").forEach(function(sel){
+      sel.addEventListener("change", function(){
+        var kind=sel.getAttribute("data-kind"),dd=sel.getAttribute("data-d"),v=+sel.value;
+        if(kind==="mood") d.mood[dd]=v; else d.motiv[dd]=v;
+        save();
+        var cell=t.querySelector('.scorerow td[data-d="'+dd+'"]');
+        if(cell) cell.textContent=pct0(((+d.mood[dd]||0)+(+d.motiv[dd]||0))/20);
+        renderMindAnalysis(); drawMentalChart();
+      });
+    });
+    renderMindAnalysis(); drawMentalChart();
+  }
+
+  // 越高越紅、越低越綠
+  function heatColor(p){ var h=120*(1-Math.max(0,Math.min(1,p))); return "hsl("+h.toFixed(0)+",68%,50%)"; }
+
+  function renderMindAnalysis(){
+    var y=state.year,m=state.month,d=monthData(y,m),weeks=weeksOf(y,m);
+    function build(kind,box){
+      box.innerHTML="";
+      weeks.forEach(function(w){
+        var sum=0,maxv=w.days.length*10;
+        w.days.forEach(function(dd){ sum+=(+(kind==="mood"?d.mood[dd.d]:d.motiv[dd.d])||0); });
+        var p=maxv?sum/maxv:0,col=heatColor(p);
+        var el=document.createElement("div"); el.className="mindrow";
+        el.innerHTML='<span class="lab">Week '+(w.idx+1)+'</span><span class="mb"><i style="width:'+Math.min(100,p*100)+'%;background:'+col+'"></i></span><span class="pv" style="color:'+col+'">'+pct(p)+'</span>';
+        box.appendChild(el);
+      });
+    }
+    build("mood",document.getElementById("moodAnal"));
+    build("motiv",document.getElementById("motivAnal"));
+  }
+
+  function drawMentalChart(){
+    var y=state.year,m=state.month,d=monthData(y,m),n=daysIn(y,m);
+    var W=1000,H=240,padL=38,padR=14,padT=14,padB=26,iw=W-padL-padR,ih=H-padT-padB;
+    var svg=document.getElementById("mentalSvg");
+    function X(day){ return padL+(n>1?iw*((day-1)/(n-1)):iw/2); }
+    function Y(p){ return padT+ih*(1-p); }
+    var s="";
+    for(var g=0;g<=4;g++){
+      var vv=g/4,yy=Y(vv);
+      s+='<line x1="'+padL+'" y1="'+yy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+yy.toFixed(1)+'" stroke="#243654" stroke-width="1"/>';
+      s+='<text x="'+(padL-6)+'" y="'+(yy+4).toFixed(1)+'" fill="#eef3fb" font-size="11" text-anchor="end">'+(vv*100)+'%</text>';
+    }
+    // week separators + a few day labels
+    for(var day=1;day<=n;day++){
+      if(day===1||day%5===0||day===n)
+        s+='<text x="'+X(day).toFixed(1)+'" y="'+(H-8)+'" fill="#8ea3c4" font-size="10" text-anchor="middle">'+day+'</text>';
+    }
+    var moodPts=[],motivPts=[];
+    for(var dd=1;dd<=n;dd++){ moodPts.push({x:X(dd),y:Y((+d.mood[dd]||0)/10)}); motivPts.push({x:X(dd),y:Y((+d.motiv[dd]||0)/10)}); }
+    s+='<path d="'+smoothPath(motivPts)+'" fill="none" stroke="#2bc7b8" stroke-width="2.4" stroke-linejoin="round"/>';
+    s+='<path d="'+smoothPath(moodPts)+'" fill="none" stroke="#7b6cf0" stroke-width="2.4" stroke-linejoin="round"/>';
+    for(var i=0;i<n;i++){
+      if((+d.motiv[i+1]||0)>0) s+='<circle cx="'+motivPts[i].x.toFixed(1)+'" cy="'+motivPts[i].y.toFixed(1)+'" r="2.6" fill="#2bc7b8"/>';
+      if((+d.mood[i+1]||0)>0) s+='<circle cx="'+moodPts[i].x.toFixed(1)+'" cy="'+moodPts[i].y.toFixed(1)+'" r="2.6" fill="#7b6cf0"/>';
+    }
+    svg.innerHTML=s;
+  }
+
+  /* ---------- dashboard ---------- */
+  function renderDashboard(){
+    var y=state.year;
+    document.getElementById("dashTitle").textContent=y+" Yearly Dashboard";
+    var cards=document.getElementById("monthCards"); cards.innerHTML="";
+    var progArr=[],mindArr=[];
+    for(var m=0;m<12;m++){
+      var C=computeMonth(y,m); progArr.push(C.progress); mindArr.push(C.mindset);
+      (function(m,C){
+        var c=document.createElement("div"); c.className="mcard";
+        c.innerHTML='<h3>'+MONTHS_EN[m]+'</h3>'+
+          '<div class="mrow"><span>Number of Habits</span><b>'+C.named+'</b></div>'+
+          '<div class="mrow"><span>Completed</span><b>'+C.totalChecks+'</b></div>'+
+          '<div class="prog"><span>Progress</span><span>'+pct(C.progress)+'</span></div>'+
+          '<div class="mind"><span>Mindset Score</span><span>'+pct(C.mindset)+'</span></div>';
+        c.onclick=function(){ state.month=m; save(); selectTab("track"); };
+        cards.appendChild(c);
+      })(m,C);
+    }
+    drawYearChart(progArr,mindArr);
+  }
+
+  function drawYearChart(prog,mind){
+    var W=1000,H=260,padL=36,padR=12,padT=16,padB=28,iw=W-padL-padR,ih=H-padT-padB;
+    var svg=document.getElementById("yearSvg");
+    var maxv=Math.max(0.05,Math.max.apply(null,prog),Math.max.apply(null,mind));
+    var top=Math.ceil(maxv*100/5)*5/100; if(top<=0) top=0.05;
+    function X(i){ return padL+iw*(i/11); }
+    function Y(v){ return padT+ih*(1-v/top); }
+    function pts(arr){ return arr.map(function(v,i){ return {x:X(i),y:Y(v)}; }); }
+    var s="";
+    for(var g=0;g<=4;g++){
+      var vv=top*g/4,yy=Y(vv);
+      s+='<line x1="'+padL+'" y1="'+yy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+yy.toFixed(1)+'" stroke="#243654" stroke-width="1"/>';
+      s+='<text x="'+(padL-6)+'" y="'+(yy+4).toFixed(1)+'" fill="#5b6f92" font-size="11" text-anchor="end">'+Math.round(vv*100)+'%</text>';
+    }
+    for(var i2=0;i2<12;i2++)
+      s+='<text x="'+X(i2).toFixed(1)+'" y="'+(H-8)+'" fill="#8ea3c4" font-size="11" text-anchor="middle">'+MONTHS_EN[i2].slice(0,3)+'</text>';
+    var pPts=pts(prog),mPts=pts(mind);
+    var area=smoothPath(pPts)+" L "+X(11).toFixed(1)+" "+Y(0).toFixed(1)+" L "+X(0).toFixed(1)+" "+Y(0).toFixed(1)+" Z";
+    s+='<path d="'+area+'" fill="rgba(79,211,154,.12)"/>';
+    s+='<path d="'+smoothPath(mPts)+'" fill="none" stroke="#e881a6" stroke-width="2.6" stroke-linejoin="round"/>';
+    s+='<path d="'+smoothPath(pPts)+'" fill="none" stroke="#4fd39a" stroke-width="2.6" stroke-linejoin="round"/>';
+    for(var i3=0;i3<12;i3++){
+      if(prog[i3]>0) s+='<circle cx="'+X(i3).toFixed(1)+'" cy="'+Y(prog[i3]).toFixed(1)+'" r="3" fill="#4fd39a"/>';
+      if(mind[i3]>0) s+='<circle cx="'+X(i3).toFixed(1)+'" cy="'+Y(mind[i3]).toFixed(1)+'" r="3" fill="#e881a6"/>';
+    }
+    svg.innerHTML=s;
+  }
+
+  /* ---------- tabs ---------- */
+  function selectTab(which){
+    var isDash=which==="dash";
+    document.getElementById("tab-dash").setAttribute("aria-selected",isDash);
+    document.getElementById("tab-track").setAttribute("aria-selected",!isDash);
+    document.getElementById("view-dash").hidden=!isDash;
+    document.getElementById("view-track").hidden=isDash;
+    if(isDash) renderDashboard(); else renderTracker();
+  }
+  document.getElementById("tab-dash").onclick=function(){ selectTab("dash"); };
+  document.getElementById("tab-track").onclick=function(){ selectTab("track"); };
+
+  var yi=document.getElementById("yearInput");
+  yi.addEventListener("change", function(){
+    var v=parseInt(yi.value,10);
+    if(!isNaN(v)&&v>=1970&&v<=2999){ state.year=v; save();
+      if(document.getElementById("view-dash").hidden) renderTracker(); else renderDashboard();
+    }
+  });
+
+  function escAttr(s){ return String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;"); }
+  function escHtml(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+  /* ---------- GitHub sync ---------- */
+  var GH_TOKEN_KEY="habitTracker.ghToken";
+  function $(id){ return document.getElementById(id); }
+  function b64encode(str){ return btoa(unescape(encodeURIComponent(str))); }
+  function b64decode(b){ return decodeURIComponent(escape(atob(String(b).replace(/\s+/g,"")))); }
+  function ghHdr(token){ return {"Authorization":"Bearer "+token,"Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28","Content-Type":"application/json"}; }
+  function ghStatus(msg,cls){ var e=$("ghStatus"); e.className="ghstatus"+(cls?" "+cls:""); e.textContent=msg; }
+  function exportJSON(){ return JSON.stringify({app:"habit-tracker",version:2,savedAt:new Date().toISOString(),year:state.year,data:state.data},null,2); }
+  function rerender(){ if($("view-dash").hidden) renderTracker(); else renderDashboard(); }
+
+  function ghReadForm(){
+    var c={owner:$("ghOwner").value.trim(),repo:$("ghRepo").value.trim(),branch:($("ghBranch").value.trim()||"main"),path:($("ghPath").value.trim()||"habit-data.json"),token:$("ghToken").value.trim()};
+    return c;
+  }
+  function ghSaveConfig(){
+    var c=ghReadForm();
+    state.gh={owner:c.owner,repo:c.repo,branch:c.branch,path:c.path}; save();
+    if($("ghRemember").checked){ try{ localStorage.setItem(GH_TOKEN_KEY,c.token); }catch(e){} }
+  }
+  function ghValidate(c){
+    if(!c.owner||!c.repo){ ghStatus("✗ 請填入 GitHub 帳號與 Repository","err"); return false; }
+    if(!c.token){ ghStatus("✗ 請填入 Access Token","err"); return false; }
+    return true;
+  }
+  function ghApiUrl(c){ return "https://api.github.com/repos/"+encodeURIComponent(c.owner)+"/"+encodeURIComponent(c.repo)+"/contents/"+c.path.split("/").map(encodeURIComponent).join("/"); }
+
+  function ghSyncSave(){
+    var c=ghReadForm(); if(!ghValidate(c)) return; ghSaveConfig();
+    $("ghSaveBtn").disabled=true; ghStatus("上傳中…");
+    var url=ghApiUrl(c);
+    fetch(url+"?ref="+encodeURIComponent(c.branch),{headers:ghHdr(c.token)})
+      .then(function(r){ if(r.status===200) return r.json().then(function(j){return j.sha;}); if(r.status===404) return null; if(r.status===401) throw new Error("Token 無效或權限不足 (401)"); if(r.status===403) throw new Error("被拒絕，token 權限不足或超出限制 (403)"); throw new Error("讀取現有檔案失敗 ("+r.status+")"); })
+      .then(function(sha){
+        var payload={message:"Update habit data "+new Date().toISOString(),content:b64encode(exportJSON()),branch:c.branch};
+        if(sha) payload.sha=sha;
+        return fetch(url,{method:"PUT",headers:ghHdr(c.token),body:JSON.stringify(payload)});
+      })
+      .then(function(r){ return r.json().then(function(j){ return {ok:r.ok,status:r.status,j:j}; }); })
+      .then(function(res){ if(res.ok){ ghStatus("✓ 已上傳到 "+c.owner+"/"+c.repo+" ／ "+c.path,"ok"); } else { throw new Error((res.j&&res.j.message)||("上傳失敗 "+res.status)); } })
+      .catch(function(err){ ghStatus("✗ "+err.message+"　若在 Claude 預覽中，對外網路被沙盒封鎖屬正常，請改用 GitHub Pages 或本機開啟。","err"); })
+      .then(function(){ $("ghSaveBtn").disabled=false; });
+  }
+
+  function ghSyncLoad(){
+    var c=ghReadForm(); if(!ghValidate(c)) return; ghSaveConfig();
+    $("ghLoadBtn").disabled=true; ghStatus("載入中…");
+    fetch(ghApiUrl(c)+"?ref="+encodeURIComponent(c.branch),{headers:ghHdr(c.token)})
+      .then(function(r){ if(r.status===404) throw new Error("repo 中找不到此檔案，請先按「上傳」建立一次"); if(r.status===401) throw new Error("Token 無效或權限不足 (401)"); if(!r.ok) throw new Error("載入失敗 ("+r.status+")"); return r.json(); })
+      .then(function(j){ var obj=JSON.parse(b64decode(j.content)); if(obj&&obj.data){ state.data=obj.data; if(obj.year) state.year=obj.year; save(); $("yearInput").value=state.year; rerender(); ghStatus("✓ 已從 GitHub 載入資料","ok"); } else { throw new Error("檔案格式不符（缺少 data 欄位）"); } })
+      .catch(function(err){ ghStatus("✗ "+err.message+"　若在 Claude 預覽中，對外網路被沙盒封鎖屬正常。","err"); })
+      .then(function(){ $("ghLoadBtn").disabled=false; });
+  }
+
+  function initGitHub(){
+    var c=state.gh||{};
+    $("ghOwner").value=c.owner||""; $("ghRepo").value=c.repo||"";
+    $("ghBranch").value=c.branch||"main"; $("ghPath").value=c.path||"habit-data.json";
+    var tok=""; try{ tok=localStorage.getItem(GH_TOKEN_KEY)||""; }catch(e){}
+    if(tok){ $("ghToken").value=tok; $("ghRemember").checked=true; }
+    $("ghToggle").addEventListener("click", function(){
+      var p=$("ghPanel"), open=p.hidden; p.hidden=!open;
+      $("ghToggle").setAttribute("aria-expanded", open?"true":"false");
+    });
+    $("ghSaveBtn").addEventListener("click", ghSyncSave);
+    $("ghLoadBtn").addEventListener("click", ghSyncLoad);
+    $("ghClearBtn").addEventListener("click", function(){ $("ghToken").value=""; $("ghRemember").checked=false; try{ localStorage.removeItem(GH_TOKEN_KEY); }catch(e){} ghStatus("已清除此裝置上的 token","ok"); });
+    $("ghRemember").addEventListener("change", function(){ if(!$("ghRemember").checked){ try{ localStorage.removeItem(GH_TOKEN_KEY); }catch(e){} } });
+  }
+
+  (function seed(){
+    if(Object.keys(state.data).length) return;
+    var d=monthData(2026,8);
+    d.habits[0]="吃飯"; d.habits[1]="睡覺"; d.habits[2]="看書";
+    d.checks["0_1"]=1; d.checks["1_1"]=1;
+    [1,2,3,4,5,6,7,9,10,11,12].forEach(function(day){ d.checks["2_"+day]=1; });
+    d.mood[1]=10; d.mood[2]=8; d.mood[3]=2; d.motiv[1]=7; d.motiv[2]=6; d.motiv[3]=8;
+    state.year=2026; state.month=8; save();
+  })();
+
+  yi.value=state.year;
+  initGitHub();
+  selectTab("dash");
+})();
+</script>
