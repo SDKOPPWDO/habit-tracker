@@ -199,6 +199,67 @@
   .mcard .mind{display:flex;justify-content:space-between;padding:6px 14px;color:#0b1120;font-weight:600;font-size:13px;background:var(--pink)}
   .muted{color:var(--muted)}
   .hint{color:var(--faint);font-size:12px;margin-top:14px;text-align:center}
+
+  /* 時間累積 */
+  .timewrap{margin-bottom:16px;position:relative;overflow:hidden}
+  .attrhead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+  .thead-title{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .attrhead h2{font-size:20px}
+  .tsub{font-size:12px;color:var(--muted);letter-spacing:.04em;background:var(--panel-3);border:1px solid var(--line);padding:3px 10px;border-radius:20px}
+
+  .timehero2{display:grid;grid-template-columns:auto minmax(0,1fr);gap:26px;align-items:center;
+    background:radial-gradient(120% 140% at 12% 10%,rgba(123,108,240,.20),rgba(43,199,184,.10) 55%,transparent 80%),var(--panel-2);
+    border:1px solid var(--line);border-radius:20px;padding:24px 26px}
+  @media(max-width:640px){.timehero2{grid-template-columns:1fr;justify-items:center;text-align:center}}
+  .tring{position:relative;width:186px;height:186px;flex:0 0 auto}
+  .tring svg{width:100%;height:100%;filter:drop-shadow(0 0 16px rgba(123,108,240,.28))}
+  #tRing{transition:stroke-dashoffset .8s cubic-bezier(.22,1,.36,1)}
+  .tring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+  .tring-center > span{font-size:clamp(38px,7vw,52px);font-weight:800;line-height:1;font-variant-numeric:tabular-nums;
+    background:linear-gradient(120deg,#8fe3c0,#7b6cf0);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .tring-center small{font-size:13px;color:var(--muted);letter-spacing:.1em}
+  .tside{width:100%;min-width:0;display:flex;flex-direction:column;gap:16px}
+  .tstats2{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .tstat{background:rgba(8,14,28,.5);border:1px solid var(--line);border-radius:14px;padding:14px 10px;text-align:center}
+  .tstat b{display:block;font-size:clamp(20px,3.4vw,26px);font-weight:800;font-variant-numeric:tabular-nums;
+    background:linear-gradient(120deg,#eef3fb,#8ea3c4);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .tstat span{display:block;font-size:11px;color:var(--muted);margin-top:4px;letter-spacing:.05em}
+  .tmilecap{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);flex-wrap:wrap;justify-content:center}
+  .tmilecap b{color:var(--good);font-weight:700}
+  .tmilecap .flag{color:var(--w1);font-weight:700}
+
+  .tchartbox{margin-top:16px;background:var(--panel-2);border:1px solid var(--line);border-radius:16px;padding:16px 14px 8px}
+  .tchart-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:6px;padding:0 4px}
+  .tchart-head > span:first-child{font-size:14px;font-weight:700}
+  .tchart-sub{font-size:11px;color:var(--muted)}
+  .tchartbox svg{width:100%;height:auto;display:block}
+  .tbreak{margin-top:16px;display:flex;flex-direction:column;gap:10px}
+  .trow{display:grid;grid-template-columns:minmax(96px,168px) 1fr auto;gap:16px;align-items:center;
+    background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:12px 16px;transition:border-color .15s,transform .15s}
+  .trow:hover{border-color:var(--w1);transform:translateX(2px)}
+  .trow .tn{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:10px}
+  .trow .trank{font-size:13px;color:var(--faint);width:22px;text-align:center;flex:0 0 auto}
+  .trow .tb{height:12px;background:var(--panel-3);border-radius:7px;overflow:hidden}
+  .trow .tb > i{display:block;height:100%;width:0;border-radius:7px;transition:width .7s cubic-bezier(.22,1,.36,1)}
+  .trow .tv{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .trow .tv b{font-size:18px;font-weight:800;display:block;line-height:1.1}
+  .trow .tv span{color:var(--muted);font-size:11px}
+  .tbreak-empty{color:var(--faint);font-size:13px;text-align:center;padding:20px 0;line-height:1.6}
+  .attrcfg{margin-top:16px;border-top:1px solid var(--line);padding-top:16px}
+  .attrcfg h3{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+  .attrnames{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px}
+  .attrnamefield{display:flex;align-items:center;gap:4px;background:var(--panel-3);border:1px solid var(--line);border-radius:8px;padding:4px 6px 4px 10px}
+  .attrnamefield input{background:transparent;border:0;color:var(--ink);font-size:14px;width:78px;font-family:inherit}
+  .attrnamefield input:focus{outline:none}
+  .attrnamefield button{background:transparent;border:0;color:var(--faint);cursor:pointer;font-size:12px;line-height:1}
+  .attrnamefield button:hover{color:#ff8a7a}
+  table.amap{border-collapse:separate;border-spacing:0;width:100%;min-width:420px}
+  table.amap th,table.amap td{padding:6px 8px;text-align:center;font-size:13px}
+  table.amap th{color:var(--muted);border-bottom:1px solid var(--line);font-weight:600}
+  table.amap td.amap-name{text-align:left;color:var(--ink);white-space:nowrap}
+  table.amap .amap-empty{color:var(--faint);padding:16px}
+  table.amap input{width:56px;background:var(--panel-3);border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:5px 6px;text-align:center;font-family:inherit;font-variant-numeric:tabular-nums}
+  table.amap input:focus{outline:2px solid var(--w1);outline-offset:1px}
 </style>
 
 <div class="wrap">
@@ -254,6 +315,52 @@
       </div>
       <svg id="yearSvg" viewBox="0 0 1000 260" width="100%" height="260" aria-hidden="true"></svg>
     </div>
+
+    <div class="panel timewrap">
+      <div class="attrhead">
+        <div class="thead-title"><h2>時間累積</h2><span class="tsub">全部累積 · 不分年</span></div>
+        <button class="ghbtn" id="timeCfgToggle">⚙ 設定每次分鐘</button>
+      </div>
+
+      <div class="timehero2">
+        <div class="tring">
+          <svg viewBox="0 0 200 200" aria-hidden="true">
+            <defs>
+              <linearGradient id="tringGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#4fd39a"/>
+                <stop offset="55%" stop-color="#2bc7b8"/>
+                <stop offset="100%" stop-color="#7b6cf0"/>
+              </linearGradient>
+            </defs>
+            <circle cx="100" cy="100" r="82" fill="none" stroke="#1b2b45" stroke-width="14"/>
+            <circle id="tRing" cx="100" cy="100" r="82" fill="none" stroke="url(#tringGrad)" stroke-width="14" stroke-linecap="round" transform="rotate(-90 100 100)" stroke-dasharray="515.2" stroke-dashoffset="515.2"/>
+          </svg>
+          <div class="tring-center"><span id="tPct">0%</span><small>占用時間</small></div>
+        </div>
+        <div class="tside">
+          <div class="tstats2">
+            <div class="tstat"><b id="tHoursCard">0</b><span>累積時數</span></div>
+            <div class="tstat"><b id="tRecDays">0</b><span>記錄天數</span></div>
+            <div class="tstat"><b id="tAvail">0</b><span>可用時數</span></div>
+          </div>
+          <div class="tmilecap" id="tMileCap"></div>
+        </div>
+      </div>
+
+      <div class="tchartbox">
+        <div class="tchart-head"><span>占用時間趨勢</span><span class="tchart-sub">每天投入習慣的時數</span></div>
+        <svg id="tTrend" viewBox="0 0 1000 240" width="100%" height="240" aria-hidden="true"></svg>
+      </div>
+
+      <div class="tbreak" id="tBreak"></div>
+
+      <div class="attrcfg" id="timeCfg" hidden>
+        <h3>每完成一次投入的分鐘數</h3>
+        <div class="scrollx"><table class="amap" id="timeMap"></table></div>
+        <p class="ghnote">在「習慣輸入面板」輸入習慣名稱後，這裡會列出各習慣，填每完成一次的分鐘數；累積時間以整年所有打勾計算。</p>
+      </div>
+    </div>
+
     <div class="months" id="monthCards"></div>
   </section>
 
@@ -321,6 +428,7 @@
   if(!state.year) state.year = 2026;
   if(state.month == null) state.month = new Date().getMonth();
   if(!state.data) state.data = {};
+  if(!state.habitTime) state.habitTime = {};
 
   function load(){ try{ var s=localStorage.getItem(LS_KEY); return s?JSON.parse(s):{}; }catch(e){ return {}; } }
   function save(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){} }
@@ -624,6 +732,124 @@
       })(m,C);
     }
     drawYearChart(progArr,mindArr);
+    renderTime();
+    renderTimeConfig();
+  }
+
+  /* ---------- 時間累積 ---------- */
+  var TIME_COLORS=["#4fd39a","#2bc7b8","#5090dd","#7b6cf0","#c56cf0","#e881a6","#f6b93b","#ff9f43","#e55039","#26de81"];
+  function allHabitNames(){
+    var seen={},names=[];
+    Object.keys(state.data).forEach(function(key){
+      var d=state.data[key]; if(!d||!d.habits) return;
+      d.habits.forEach(function(h){ h=(h||"").trim(); if(h&&!seen[h]){ seen[h]=1; names.push(h); } });
+    });
+    return names;
+  }
+  function fmt1(v){ var r=Math.round(v*10)/10; return Number.isInteger(r)?String(r):r.toFixed(1); }
+  // 跨所有年份累計（不分年）＋ 記錄天數 ＋ 每日趨勢
+  function computeTime(){
+    var perHabit={},totalMin=0,totalDone=0,recDays=0,series=[];
+    Object.keys(state.data).forEach(function(key){
+      var d=state.data[key]; if(!d||!d.habits||!d.checks) return;
+      var parts=key.split("-"),y=+parts[0],m=+parts[1];
+      if(isNaN(y)||isNaN(m)) return;
+      var n=daysIn(y,m);
+      for(var day=1;day<=n;day++){
+        var any=false,dayMin=0;
+        for(var r=0;r<ROWS;r++){
+          if(!d.checks[r+"_"+day]) continue;
+          any=true;
+          var nm=(d.habits[r]||"").trim(); if(!nm) continue;
+          var mins=+state.habitTime[nm]||0; if(mins<=0) continue;
+          dayMin+=mins; totalMin+=mins; totalDone++;
+          if(!perHabit[nm]) perHabit[nm]={min:0,done:0};
+          perHabit[nm].min+=mins; perHabit[nm].done++;
+        }
+        if(any){ recDays++; series.push({t:new Date(y,m,day).getTime(),h:dayMin/60,label:(m+1)+"/"+day}); }
+      }
+    });
+    series.sort(function(a,b){ return a.t-b.t; });
+    return {perHabit:perHabit,totalMin:totalMin,totalDone:totalDone,recDays:recDays,series:series};
+  }
+  function drawTrend(series){
+    var svg=document.getElementById("tTrend"); if(!svg) return;
+    var W=1000,H=240,padL=46,padR=18,padT=16,padB=28,iw=W-padL-padR,ih=H-padT-padB;
+    if(!series.length){ svg.innerHTML='<text x="500" y="124" fill="#5b6f92" font-size="14" text-anchor="middle">還沒有資料，去習慣面板打勾後就會有趨勢</text>'; return; }
+    var maxH=0; series.forEach(function(s){ if(s.h>maxH) maxH=s.h; });
+    var topH=Math.max(1,Math.ceil(maxH*1.15*10)/10);
+    var tmin=series[0].t,tmax=series[series.length-1].t,tspan=(tmax-tmin)||1;
+    function X(t){ return series.length===1?padL+iw/2:padL+iw*((t-tmin)/tspan); }
+    function Y(h){ return padT+ih*(1-h/topH); }
+    var s='<defs><linearGradient id="tgrad" x1="0" y1="0" x2="0" y2="1">'+
+      '<stop offset="0%" stop-color="rgba(123,108,240,.42)"/>'+
+      '<stop offset="100%" stop-color="rgba(43,199,184,.03)"/></linearGradient></defs>';
+    for(var g=0;g<=4;g++){
+      var vv=topH*g/4,yy=Y(vv);
+      s+='<line x1="'+padL+'" y1="'+yy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+yy.toFixed(1)+'" stroke="#243654" stroke-width="1"/>';
+      s+='<text x="'+(padL-8)+'" y="'+(yy+4).toFixed(1)+'" fill="#8ea3c4" font-size="11" text-anchor="end">'+fmt1(vv)+'h</text>';
+    }
+    var pts=series.map(function(o){ return {x:X(o.t),y:Y(o.h)}; });
+    // x 標籤（最多約 6 個）
+    var step=Math.max(1,Math.ceil(series.length/6));
+    for(var i=0;i<series.length;i+=step){ s+='<text x="'+X(series[i].t).toFixed(1)+'" y="'+(H-8)+'" fill="#8ea3c4" font-size="11" text-anchor="middle">'+series[i].label+'</text>'; }
+    if(series.length>1){
+      var area=smoothPath(pts)+" L "+X(tmax).toFixed(1)+" "+Y(0).toFixed(1)+" L "+X(tmin).toFixed(1)+" "+Y(0).toFixed(1)+" Z";
+      s+='<path d="'+area+'" fill="url(#tgrad)"/>';
+      s+='<path d="'+smoothPath(pts)+'" fill="none" stroke="#7b6cf0" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>';
+    }
+    pts.forEach(function(p){ s+='<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="3.2" fill="#8fe3c0" stroke="#0b1120" stroke-width="1.5"/>'; });
+    svg.innerHTML=s;
+  }
+  function renderTime(){
+    var T=computeTime(),hours=T.totalMin/60,availH=T.recDays*24;
+    var frac=availH?hours/availH:0, pct=Math.round(frac*100);
+    document.getElementById("tPct").textContent=pct+"%";
+    document.getElementById("tHoursCard").textContent=fmt1(hours);
+    document.getElementById("tRecDays").textContent=T.recDays;
+    document.getElementById("tAvail").textContent=fmt1(availH);
+    var C=515.2,ring=document.getElementById("tRing"); if(ring) ring.style.strokeDashoffset=(C*(1-Math.max(0,Math.min(1,frac)))).toFixed(1);
+    var cap=document.getElementById("tMileCap");
+    if(cap) cap.innerHTML= T.recDays
+      ? '累積 <b>'+fmt1(hours)+' h</b> ／ 可用 <b>'+fmt1(availH)+' h</b>（記錄 '+T.recDays+' 天）· 共 '+T.totalDone+' 次'
+      : '還沒有記錄 — 到習慣面板打勾就會開始統計';
+    drawTrend(T.series);
+
+    var perHabit=T.perHabit;
+    var arr=Object.keys(perHabit).map(function(nm){ return {name:nm,min:perHabit[nm].min,done:perHabit[nm].done}; });
+    arr.sort(function(a,b){ return b.min-a.min; });
+    var box=document.getElementById("tBreak");
+    if(!arr.length){ box.innerHTML='<div class="tbreak-empty">還沒有累積時間 🚀<br>按右上「⚙ 設定每次分鐘」為習慣設定時間，再到習慣面板打勾就會開始累積。</div>'; return; }
+    var max=arr[0].min||1;
+    box.innerHTML=arr.map(function(o,i){
+      var col=TIME_COLORS[i%TIME_COLORS.length];
+      var days=o.min/1440, w=Math.max(3,o.min/max*100);
+      var medal=i===0?"🥇":i===1?"🥈":i===2?"🥉":(i+1);
+      return '<div class="trow"><span class="tn"><span class="trank">'+medal+'</span>'+escHtml(o.name)+'</span>'+
+        '<span class="tb"><i style="width:'+w+'%;background:linear-gradient(90deg,'+col+',#7b6cf0)"></i></span>'+
+        '<span class="tv"><b style="color:'+col+'">'+fmt1(days)+' 天</b><span>'+Math.round(o.min).toLocaleString()+' 分 · '+o.done+' 次</span></span></div>';
+    }).join("");
+  }
+  function renderTimeConfig(){
+    var names=allHabitNames(),t=document.getElementById("timeMap"); if(!t) return;
+    var html='<thead><tr><th class="amap-name">習慣</th><th>分鐘 / 次</th></tr></thead><tbody>';
+    if(!names.length){ html+='<tr><td class="amap-empty" colspan="2">尚未輸入任何習慣</td></tr>'; }
+    names.forEach(function(nm){
+      var v=(state.habitTime[nm]!=null)?state.habitTime[nm]:"";
+      html+='<tr><td class="amap-name">'+escHtml(nm)+'</td><td><input type="number" step="1" min="0" value="'+v+'" data-nm="'+escAttr(nm)+'" placeholder="0"></td></tr>';
+    });
+    html+='</tbody>';
+    t.innerHTML=html;
+    t.querySelectorAll("input[type=number]").forEach(function(inp){
+      inp.addEventListener("input",function(){
+        var nm=inp.getAttribute("data-nm"),val=parseFloat(inp.value);
+        if(isNaN(val)||val<=0) delete state.habitTime[nm]; else state.habitTime[nm]=val;
+        save(); renderTime();
+      });
+    });
+  }
+  function initTime(){
+    document.getElementById("timeCfgToggle").addEventListener("click",function(){ var p=document.getElementById("timeCfg"); p.hidden=!p.hidden; });
   }
 
   function drawYearChart(prog,mind){
@@ -758,6 +984,7 @@
 
   yi.value=state.year;
   initGitHub();
+  initTime();
   selectTab("dash");
 })();
 </script>
